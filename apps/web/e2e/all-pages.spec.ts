@@ -236,11 +236,35 @@ test('只读角色的每个页面同样不报错', async ({ page, request }) => 
     ).toBeVisible({ timeout: 15_000 });
   }
 
-  // 只读角色不应该看到任何"能改"的入口
-  await page.goto(`${pageRoutes(data)[6]!.path}`);
+  // 只读角色不应该看到任何"能改"的入口（显式跳到编辑草稿，别依赖路由数组下标）
+  await page.goto(`/w/${data.workspaceId}/recipes/${data.recipeId}/edit`);
   await expect(page.getByRole('button', { name: /添加步骤|提交并发布/ })).toHaveCount(0);
 
   expect(problems, `只读角色页面报错：\n${problems.join('\n')}`).toEqual([]);
+});
+
+test('参照物换算器按已登记餐具把口语用量折成克数', async ({ page, request }) => {
+  const data = await seed(request);
+  await authenticate(page, data.tokens);
+
+  await page.goto(`/w/${data.workspaceId}/converter`);
+  await expect(page.getByRole('heading', { name: '参照物换算器' })).toBeVisible();
+
+  // seed 里登记了「白瓷勺 1 个 = 8g」，半勺应折成 4g 并带容错区间
+  await page.getByPlaceholder(/半勺老抽/).fill('半勺老抽');
+  await expect(page.getByText(/4g/).first()).toBeVisible();
+  await expect(page.getByText(/容错/)).toBeVisible();
+  await expect(page.getByText(/按已登记餐具/)).toBeVisible();
+
+  // 没登记"把"，一小把走经验估值，要明确标出来
+  await page.getByPlaceholder(/半勺老抽/).fill('一小把虾皮');
+  await expect(page.getByText(/经验估值/)).toBeVisible();
+  await expect(page.getByText(/10g/)).toBeVisible();
+
+  // 没登记过"盆"，不能瞎猜，要提示去登记
+  await page.getByPlaceholder(/半勺老抽/).fill('半盆面');
+  await expect(page.getByText(/无法换算/)).toBeVisible();
+  await expect(page.getByText(/登记/).first()).toBeVisible();
 });
 
 function pageRoutes(data: Seeded): { path: string; expect: RegExp }[] {
@@ -250,6 +274,7 @@ function pageRoutes(data: Seeded): { path: string; expect: RegExp }[] {
   return [
     { path: '/', expect: /我的家庭空间/ },
     { path: base, expect: /全页面巡检厨房/ },
+    { path: `${base}/converter`, expect: /参照物换算器/ },
     { path: `${base}/members`, expect: /成员与参照物/ },
     { path: `${base}/notifications`, expect: /通知/ },
     { path: `${base}/activity`, expect: /操作日志/ },

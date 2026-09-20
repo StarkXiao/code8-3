@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   App as AntApp,
   Button,
@@ -176,7 +176,14 @@ export function MembersPage() {
       />
 
       <div className="froa-card">
-        <h3 className="froa-card-title">参照物登记</h3>
+        <div className="froa-row" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 className="froa-card-title" style={{ margin: 0 }}>
+            参照物登记
+          </h3>
+          <Link to={`/w/${workspaceId}/converter`}>
+            <Button type="link">打开参照物换算器 →</Button>
+          </Link>
+        </div>
         <Typography.Paragraph type="secondary">
           先把"家里那只勺、那只碗"量化一次，之后所有"一勺""一碗"都能换算成克 ——
           这是把模糊用量变成数值最有效的办法。
