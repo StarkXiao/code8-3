@@ -18,6 +18,7 @@ import { ROLE_LABELS, WORKSPACE_ROLES, type WorkspaceRole } from '@froa/shared';
 import { workspaceApi } from '../../api/endpoints';
 import { errorMessage } from '../../api/client';
 import { useAuthStore } from '../../store/auth';
+import { ReferenceConverter } from './ReferenceConverter';
 
 const ROLE_HINTS: Record<WorkspaceRole, string> = {
   owner: '可管理成员与全部内容',
@@ -222,6 +223,8 @@ export function MembersPage() {
           ]}
         />
       </div>
+
+      <ReferenceConverter references={references.data ?? []} />
     </div>
   );
 }

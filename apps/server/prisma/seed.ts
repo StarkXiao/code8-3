@@ -106,6 +106,15 @@ async function main() {
         note: '一碗水约 220ml',
         createdBy: organizer.id,
       },
+      {
+        id: 'seed-ref-4',
+        workspaceId: workspace.id,
+        label: '外婆的手（一把）',
+        amountValue: 80,
+        amountUnit: 'g',
+        note: '正常抓一把约 80g，小把约 40g（手感量，误差大）',
+        createdBy: organizer.id,
+      },
     ],
   });
 
